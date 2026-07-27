@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일본 도시별 대표 환경 Explorer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            red: '#E60012',
+                            dark: '#1E293B',
+                            accent: '#38BDF8',
+                            gold: '#F59E0B'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar & glassmorphism styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Navbar -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🇯🇵</span>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                        Japan Travel Explorer
+                        <span class="text-xs font-semibold px-2 py-0.5 bg-red-100 text-brand-red rounded-full">Interactive</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">클릭하여 각 도시의 매력과 주요 환경을 탐색해보세요</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="도시 또는 키워드 검색..." 
+                           class="pl-9 pr-4 py-1.5 text-sm bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500/50 w-36 sm:w-60 transition-all">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+        
+        <!-- Hero Tagline & Stats Banner -->
+        <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-black pointer-events-none">JAPAN</div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-block px-3 py-1 bg-red-600/80 text-white text-xs font-bold rounded-full mb-3 tracking-wider">나에게 딱 맞는 여행지 찾기</span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight mb-3">
+                    일본 도시별 주요 환경과<br><span class="text-sky-400">명소·테마</span>를 한눈에 둘러보세요!
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base mb-4">
+                    도심의 화려한 야경부터 전통 가옥 거리, 온천 마을, 대자연, 휴양지까지 도시 카드를 클릭하면 상세 분위기와 환경을 미리 확인할 수 있습니다.
+                </p>
+            </div>
+
+            <!-- Quick Filter Chips -->
+            <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 items-center">
+                <span class="text-xs text-slate-400 font-medium mr-1"><i class="fa-solid fa-filter mr-1"></i>테마 필터:</span>
+                <button onclick="filterCities('all')" class="filter-btn active-filter text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-white text-slate-900 shadow">전체 보기</button>
+                <button onclick="filterCities('urban')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">🏙️ 현대 도시 & 쇼핑</button>
+                <button onclick="filterCities('culture')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">⛩️ 역사 & 전통</button>
+                <button onclick="filterCities('onsen')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">♨️ 힐링 & 온천</button>
+                <button onclick="filterCities('nature')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">❄️ 대자연 & 설경</button>
+                <button onclick="filterCities('resort')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">🏖️ 휴양 & 에메랄드 바다</button>
+            </div>
+        </section>
+
+        <!-- City Cards Grid Section -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-brand-red"></i>
+                    주요 추천 도시 목록
+                    <span id="cityCountBadge" class="text-xs bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">8개 도시</span>
+                </h3>
+                <span class="text-xs text-slate-500"><i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i>카드를 클릭하면 상세 환경이 열립니다</span>
+            </div>
+
+            <!-- Cards Container -->
+            <div id="cityGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <!-- Dynamically Populated via JavaScript -->
+            </div>
+        </section>
+    </main>
+
+    <!-- City Detail Modal -->
+    <div id="cityModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transform scale-95 transition-all duration-300" id="modalContainer">
+            
+            <!-- Modal Header / Hero Banner -->
+            <div id="modalHero" class="relative h-64 sm:h-80 bg-slate-800 text-white p-6 flex flex-col justify-end bg-cover bg-center">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                
+                <!-- Close Button -->
+                <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-900/60 hover:bg-slate-900/90 backdrop-blur-md text-white flex items-center justify-center transition-all shadow-lg z-10">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+
+                <!-- Top Badge & Region -->
+                <div class="relative z-10 flex items-center gap-2 mb-2">
+                    <span id="modalRegion" class="text-xs font-bold px-3 py-1 bg-red-600 text-white rounded-full uppercase tracking-wider">관동</span>
+                    <span id="modalVibeBadge" class="text-xs font-semibold px-3 py-1 bg-white/20 backdrop-blur-md text-white rounded-full">화려한 초고층 빌딩 & 문화 중심지</span>
+                </div>
+
+                <h2 id="modalTitle" class="relative z-10 text-3xl sm:text-5xl font-black tracking-tight drop-shadow-md">도쿄 (Tokyo)</h2>
+                <p id="modalTagline" class="relative z-10 text-slate-200 text-sm sm:text-base mt-1 font-medium">전통과 초현대가 절묘하게 교차하는 매혹적인 거대 대도시</p>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-6 sm:p-8 overflow-y-auto space-y-6 flex-grow bg-slate-50">
+                
+                <!-- Environment & Atmosphere Cards -->
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-mountain-city text-red-500"></i> 도시의 주요 환경 & 분위기 (Environment Vibe)
+                    </h3>
+                    <div id="modalEnvGrid" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Key Highlights & Attractions -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-sky-500"></i> 주요 관광명소 추천 목록
+                        </h3>
+                        <span class="text-xs text-sky-600 font-semibold bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full">
+                            <i class="fa-solid fa-hand-pointer mr-1"></i>명소 클릭 시 길안내 & 상세정보
+                        </span>
+                    </div>
+                    <div id="modalAttractions" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Culinary & Local Delicacies -->
+                <div class="bg-amber-50/70 border border-amber-200/60 rounded-2xl p-4">
+                    <h3 class="text-sm font-bold text-amber-900 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-utensils text-amber-600"></i> 대표 미식 & 먹거리 환경
+                    </h3>
+                    <p id="modalFood" class="text-xs sm:text-sm text-amber-800 leading-relaxed"></p>
+                </div>
+
+                <!-- Best Season & Travel Tip -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1"><i class="fa-solid fa-calendar-days text-indigo-500 mr-1"></i> 추천 방문 계절</div>
+                        <div id="modalSeason" class="text-sm font-semibold text-slate-800"></div>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4">
+                        <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1"><i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> 현지 여행 꿀팁</div>
+                        <div id="modalTip" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 bg-white border-t border-slate-200 flex justify-end">
+                <button onclick="closeModal()" class="px-5 py-2 text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white rounded-xl transition-all">
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spot Detail & Navigation Modal -->
+    <div id="spotModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div id="spotModalContainer" class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] transform scale-95 transition-all duration-300">
+            
+            <!-- Spot Image Banner -->
+            <div class="relative h-56 sm:h-64 bg-slate-900">
+                <img id="spotImage" src="" alt="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent"></div>
+                
+                <button onclick="closeSpotModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-900/70 hover:bg-slate-900 backdrop-blur-md text-white flex items-center justify-center transition-all shadow-md z-10">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+
+                <div class="absolute bottom-4 left-5 right-5 text-white">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span id="spotTag" class="text-[11px] font-bold px-2.5 py-0.5 bg-sky-500 text-white rounded-full"></span>
+                        <span id="spotJapaneseName" class="text-xs opacity-80 font-mono"></span>
+                    </div>
+                    <h3 id="spotTitle" class="text-2xl sm:text-3xl font-black"></h3>
+                </div>
+            </div>
+
+            <!-- Spot Content Area -->
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-5 bg-slate-50 flex-grow text-slate-800">
+                
+                <!-- Description -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info text-sky-500"></i> 명소 소개 및 핵심 포인트
+                    </h4>
+                    <p id="spotDesc" class="text-sm text-slate-700 leading-relaxed font-normal bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm"></p>
+                </div>
+
+                <!-- Navigation & Transport Guide Card -->
+                <div class="bg-indigo-900 text-white p-4 rounded-2xl shadow-md relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 text-indigo-800/40 text-8xl font-black pointer-events-none">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h4 class="text-xs font-bold uppercase text-indigo-200 tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-train-subway text-sky-300"></i> 길안내 & 대중교통 접근 방법
+                        </h4>
+                        <div id="spotTransport" class="text-xs sm:text-sm text-indigo-50 font-medium leading-relaxed mb-3"></div>
+                        
+                        <div class="flex items-center gap-2 text-xs text-indigo-200/90 pt-2 border-t border-indigo-800">
+                            <i class="fa-solid fa-location-dot text-red-400"></i>
+                            <span id="spotAddress" class="truncate"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visit Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-400 font-bold mb-1"><i class="fa-solid fa-clock text-amber-500 mr-1"></i> 추천 방문 시간대</div>
+                        <div id="spotBestTime" class="font-semibold text-slate-800"></div>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                        <div class="text-slate-400 font-bold mb-1"><i class="fa-solid fa-ticket text-emerald-500 mr-1"></i> 입장료 / 관람 정보</div>
+                        <div id="spotCost" class="font-semibold text-slate-800"></div>
+                    </div>
+                </div>
+
+                <!-- Map Action Buttons -->
+                <div class="pt-2 flex flex-col sm:flex-row gap-2">
+                    <a id="spotMapSearchBtn" target="_blank" rel="noopener noreferrer" 
+                       class="flex-1 py-3 px-4 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm rounded-xl text-center shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-map-location-dot text-base"></i> Google Maps에서 위치 보기
+                    </a>
+                    <a id="spotNaviBtn" target="_blank" rel="noopener noreferrer" 
+                       class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl text-center shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-diamond-turn-right text-base"></i> Google Maps 길찾기 시작
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="p-3 bg-white border-t border-slate-200 flex justify-end">
+                <button onclick="closeSpotModal()" class="px-4 py-2 text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl transition-all">
+                    돌아가기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Expanded Data for Cities with Detailed Spot Navigation
+        const citiesData = [
+            {
+                id: 'tokyo',
+                name: '도쿄',
+                englishName: 'Tokyo',
+                region: '관동 (Kanto)',
+                category: 'urban',
+                categoryLabel: '🏙️ 현대 도시 & 쇼핑',
+                image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '네온사인 번화가와 첨단 문화, 고즈넉한 정원이 절묘하게 조화된 매가시티',
+                tagline: '세계 최대 규모의 대도시와 다채로운 서브컬처, 명품 쇼핑의 천국',
+                envCards: [
+                    { title: '도심 스카이라인', desc: '초고층 마천루와 시부야 스크램블, 신주쿠의 화려한 네온 상가가 가득합니다.', icon: 'fa-building-ngo' },
+                    { title: '대중교통 네트워크', desc: '세계에서 가장 촘촘한 지하철/철도망으로 근교까지 원스톱 이동 가능.', icon: 'fa-train-subway' },
+                    { title: '공원 & 사찰', desc: '아사쿠사 센소지, 메이지신궁, 신주쿠 교엔 등 조용하고 넓은 녹지가 공존.', icon: 'fa-torii-gate' }
+                ],
+                attractions: [
+                    {
+                        id: 'tokyo_sensoji',
+                        name: '아사쿠사 센소지 (浅草寺)',
+                        japaneseName: 'Sensō-ji',
+                        tag: '⛩️ 고풍 사찰',
+                        image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '도쿄에서 가장 오래된 고풍스러운 상징 사찰과 전통 상점가 나카미세도리',
+                        desc: '645년에 창건된 도쿄에서 가장 역사가 오래된 사원입니다. 입구의 대형 붉은 제등 "가미나리몬"을 지나 사찰 본당까지 연결된 250m 길이의 나카미세 상가에서는 전통 과자와 아기자기한 기념품을 둘러볼 수 있습니다.',
+                        address: '東京都台東区浅草2-3-1 (2-3-1 Asakusa, Taito City, Tokyo)',
+                        transport: '도쿄 메트로 긴자선(Ginza Line) 또는 도에이 아사쿠사선(Asakusa Line) [아사쿠사역] 1번/3번 출구에서 도보 약 5분',
+                        mapQuery: 'Sensō-ji, Tokyo',
+                        bestTime: '오전 8시 이전 (한적한 산책) 또는 19:00 이후 (조명 야경)',
+                        cost: '경내 입장 무료 (운세 오미쿠지 100엔)'
+                    },
+                    {
+                        id: 'tokyo_shibuya',
+                        name: '시부야 스크램블 & 시부야 스카이',
+                        japaneseName: 'Shibuya Sky & Scramble Crossing',
+                        tag: '🏙️ 랜드마크 / 전망대',
+                        image: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '수천 명이 동시에 건너는 활력 넘치는 교차로와 229m 도심 옥상 전망대',
+                        desc: '세계에서 가장 붐비는 교차로로 손꼽히는 시부야 스크램블 교차로와, 시부야 스크램블 스퀘어 건물 옥상 229m 높이에서 도쿄 전경 및 후지산까지 한눈에 감상할 수 있는 시부야 스카이가 최고의 야경 포인트입니다.',
+                        address: '東京都渋谷区渋谷2-24-12 (2-24-12 Shibuya, Shibuya City, Tokyo)',
+                        transport: 'JR 야마노테선/이노카시라선/도쿄메트로 [시부야역] B6번 출구 직결',
+                        mapQuery: 'Shibuya Sky, Tokyo',
+                        bestTime: '일몰 1시간 전~야경 타임 (사전 온라인 티켓 예약 필수)',
+                        cost: '시부야 스카이 성인 약 2,200엔~2,500엔'
+                    },
+                    {
+                        id: 'tokyo_meiji',
+                        name: '메이지 신궁 & 하라주쿠',
+                        japaneseName: 'Meiji Jingu & Harajuku',
+                        tag: '🌲 도심 울창한 숲',
+                        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '도쿄 한복판에 위치한 70만㎡ 규모의 인공 원시림과 트렌디한 타케시타 도리',
+                        desc: '도심 속 울창한 삼림욕을 즐길 수 있는 신사입니다. 입구의 웅장한 목조 도리이를 지나 자갈길을 걸으면 도쿄 도심이라는 사실을 잊게 만듭니다. 신사 바로 앞 하라주쿠 타케시타 도리에서는 스트리트 패션과 디저트를 즐길 수 있습니다.',
+                        address: '東京都渋谷区代々木神園町1-1 (1-1 Yoyogikamizonocho, Shibuya City, Tokyo)',
+                        transport: 'JR 야마노테선 [하라주쿠역] 표가지 출구 도보 1분 또는 도쿄메트로 [메이지진구마에역] 2번 출구',
+                        mapQuery: 'Meiji Jingu, Tokyo',
+                        bestTime: '오전 9시~11시 (선선하고 호젓한 울림길 산책)',
+                        cost: '신궁 입장 무료 (내원 정원 관람 시 500엔)'
+                    },
+                    {
+                        id: 'tokyo_tower',
+                        name: '도쿄 타워 (Tokyo Tower)',
+                        japaneseName: 'Tokyo Tower',
+                        tag: '🗼 야경 낭만',
+                        image: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '도쿄의 영원한 낭만 상징, 붉은색 철탑과 아카바네바시 야경 스팟',
+                        desc: '1958년 완공된 높이 333m의 철탑으로 레트로한 감성과 낭만적인 밤 풍경을 선사합니다. 메인 데크(150m)와 탑 데크(250m) 전망대에서 도쿄의 환상적인 밤하늘을 조망할 수 있습니다.',
+                        address: '東京都港区芝公園4-2-8 (4-2-8 Shibakoen, Minato City, Tokyo)',
+                        transport: '도에이 오에도선 [아카바네바시역] 중문출구 도보 5분 / 도쿄 메트로 히비야선 [카미야초역] 1번 출구 도보 7분',
+                        mapQuery: 'Tokyo Tower, Tokyo',
+                        bestTime: '해질녘~22:00 (조명점등 라이트업 감상)',
+                        cost: '메인데크 성인 1,200엔 / 탑데크 투어 3,000엔'
+                    }
+                ],
+                food: '스시(초밥), 몬자야키, 아키하바라 이자카야, 도쿄식 라멘, 디저트 카페',
+                season: '봄 (3~4월 벚꽃 시즌) / 가을 (10~11월 선선한 날씨)',
+                tip: 'Suica나 Pasmo 실물/애플페이 교통카드를 미리 등록해두면 지하철 이동과 편의점 결제가 매우 편리합니다.'
+            },
+            {
+                id: 'kyoto',
+                name: '교토',
+                englishName: 'Kyoto',
+                region: '간사이 (Kansai)',
+                category: 'culture',
+                categoryLabel: '⛩️ 역사 & 전통',
+                image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '천년 고도(古都)의 숨결, 유네스코 세계유산과 목조 가옥이 보존된 전통 도심',
+                tagline: '붉은 도리이와 대나무 숲, 고즈넉한 젠(Zen) 정원이 펼쳐진 문화의 중심',
+                envCards: [
+                    { title: '전통 목조 건축물', desc: '기온 거리의 마치야(전통 가옥)와 수많은 사찰, 신사가 보존되어 있습니다.', icon: 'fa-house-chimney-window' },
+                    { title: '자연과의 조화', desc: '아라시야마 대나무 숲과 카모강 수변 산책로가 시내 중심과 인접.', icon: 'fa-tree' },
+                    { title: '고요함과 정운', desc: '다도 문화와 정갈한 가이세키 요리를 즐길 수 있는 고요한 분위기.', icon: 'fa-spa' }
+                ],
+                attractions: [
+                    {
+                        id: 'kyoto_fushimi',
+                        name: '후시미 이나리 신사 (여우신사)',
+                        japaneseName: 'Fushimi Inari Taisha',
+                        tag: '⛩️ 주황빛 붉은 도리이',
+                        image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '산기슭을 따라 붉은 도리이 수천 개가 이어지는 신비로운 신사 산책로',
+                        desc: '곡식과 사업 번창을 기원하는 이나리 신사의 본산입니다. "센본 도리이"라고 불리는 붉은 도리이 터널이 산 정상까지 4km 가량 연결되어 있으며, 게이샤의 추억 영화 촬영지로도 유명을 얻었습니다.',
+                        address: '京都府京都市伏見区深草薮ノ内町68 (68 Fukakusa Yabunouchicho, Fushimi Ward, Kyoto)',
+                        transport: 'JR 나라선 [이나리역(Inari Station)] 하차 직후 정문 연결 (교토역에서 JR로 5분)',
+                        mapQuery: 'Fushimi Inari Taisha, Kyoto',
+                        bestTime: '오전 7:00~8:30 (관광객이 몰리기 전 차분한 분위기)',
+                        cost: '입장료 무료 (24시간 자유 개방)'
+                    },
+                    {
+                        id: 'kyoto_kiyomizu',
+                        name: '기요미즈데라 (청수사)',
+                        japaneseName: 'Kiyomizu-dera',
+                        tag: '🏯 절벽 목조 툇마루',
+                        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '절벽 위에 못을 사용하지 않고 세워진 목조 무대와 교토 전경 조망',
+                        desc: '778년에 창건된 유네스코 세계문화유산으로, 웅장한 목조 무대에서 내려다보는 교토 시내 전망과 봄 벚꽃, 가을 단풍 풍경이 장관입니다. 올라가는 길인 산넨자카·닌넨자카 거리에는 예쁜 기치 전통 상점이 즐비합니다.',
+                        address: '京都府京都市東山区清水1-294 (1-294 Kiyomizu, Higashiyama Ward, Kyoto)',
+                        transport: '교토 시버스 206번/207번 탑승 후 [고죠자카(Gojo-zaka)] 또는 [기요미즈미치] 버스정류장 하차 후 언덕 도보 10분',
+                        mapQuery: 'Kiyomizu-dera, Kyoto',
+                        bestTime: '오전 8:00 또는 해질녘 계절 단풍 야간개장 타임',
+                        cost: '성인 400엔 (특별 야간관람 시 500엔)'
+                    },
+                    {
+                        id: 'kyoto_arashiyama',
+                        name: '아라시야마 치쿠린 대나무 숲',
+                        japaneseName: 'Arashiyama Bamboo Grove',
+                        tag: '🎋 힐링 대나무길',
+                        image: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '바람 소리와 대나무 향이 머무는 울창한 힐링 대나무 숲길',
+                        desc: '수직으로 높이 솟은 수만 그루의 대나무가 하늘을 가리는 고즈넉한 오솔길입니다. 근처 텐류지 사원의 젠(Zen) 정원 및 아라시야마를 가로지르는 도게츠교 다리와 함께 사계절 자연을 만끽하기 좋습니다.',
+                        address: '京都府京都市右京区嵯峨小倉山田渕山町 (Sagaogurayama Tabuchiyamacho, Ukyo Ward, Kyoto)',
+                        transport: 'JR 사가노선 [사가아라시야마역] 도보 10분 / 한큐 전철 [아라시야마역] 도보 15분',
+                        mapQuery: 'Arashiyama Bamboo Grove, Kyoto',
+                        bestTime: '오전 8시 이전 (바람 소리를 들을 수 있는 호젓함)',
+                        cost: '대나무 숲 산책로 무료 (텐류지 사원 입장료 500엔)'
+                    }
+                ],
+                food: '가이세키 정식, 말차(Matcha) 디저트, 교토식 유두부(두부요리), 소바',
+                season: '가을 (11월 단풍 절정) / 봄 (4월 벚꽃)',
+                tip: '인기 명소(청수사, 후시미 이나리)는 오전 8시 이전에 방문해야 한적하게 사진을 찍을 수 있습니다.'
+            },
+            {
+                id: 'osaka',
+                name: '오사카',
+                englishName: 'Osaka',
+                region: '간사이 (Kansai)',
+                category: 'urban',
+                categoryLabel: '🛍️ 미식 & 쇼핑',
+                image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '활기찬 에너지, 글리코상 야경과 천하의 부엌이라 불리는 스트리트 푸드천국',
+                tagline: '입이 즐거운 식도락 여행과 유니버설 스튜디오의 즐거움이 가득한 도시',
+                envCards: [
+                    { title: '화려한 네온 간판', desc: '도톤보리 운하 주변의 입체적인 상점 간판과 활기찬 밤거리.', icon: 'fa-lightbulb' },
+                    { title: '운하와 친수 공간', desc: '도톤보리 강 크루즈 및 우메다 도심의 현대적 스카이라인.', icon: 'fa-water' },
+                    { title: '개방적인 상인 문화', desc: '친근하고 활발한 현지인들과 활력 넘치는 시장 분위기.', icon: 'fa-comments' }
+                ],
+                attractions: [
+                    {
+                        id: 'osaka_dotonbori',
+                        name: '도톤보리 & 글리코상 (Dotonbori)',
+                        japaneseName: 'Dōtonbori',
+                        tag: '🍢 스트리트 푸드 & 네온사인',
+                        image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '달리는 마라토너 글리코상 간판과 타코야키 냄새가 가득한 오사카의 심장',
+                        desc: '운하를 따라 화려한 3D 입체 간판과 네온사인이 불을 밝히는 오사카 대표 번화가입니다. 도톤보리 리버 크루즈를 타거나 다리 위에서 글리코상 포즈로 인증샷을 남기는 것이 필수 코스입니다.',
+                        address: '大阪府大阪市中央区道頓堀1丁目 (Dotonbori, Chuo Ward, Osaka)',
+                        transport: '오사카 메트로 미도스지선/센니치마에선 [난바역(Namba)] 14번 출구 도보 3분',
+                        mapQuery: 'Dotonbori Glico Sign, Osaka',
+                        bestTime: '18:00~22:00 (네온사인 및 운하 야경 감상)',
+                        cost: '거리 무료 / 리버크루즈 약 1,200엔 (주유패스 무료)'
+                    },
+                    {
+                        id: 'osaka_castle',
+                        name: '오사카성 (Osaka Castle)',
+                        japaneseName: 'Osaka Castle (大阪城)',
+                        tag: '🏯 웅장한 성곽 공원',
+                        image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '높은 돌담과 해자로 둘러싸인 금빛 장식의 오사카 대표 역사 성곽',
+                        desc: '도요토미 히데요시가 건설한 성으로, 현재 천수각 내부는 오사카 역사를 다룬 박물관과 8층 전망대로 운영됩니다. 넓은 공원과 해자를 둘러보는 놀룻배(고자부네) 체험도 인기가 높습니다.',
+                        address: '大阪府大阪市中央区大阪城1-1 (1-1 Osakajo, Chuo Ward, Osaka)',
+                        transport: 'JR 오사카조코엔역(Osakajokoen) 도보 5분 또는 메트로 [다니마치욘초메역] 1B/9번 출구',
+                        mapQuery: 'Osaka Castle, Osaka',
+                        bestTime: '오전 9:00~11:00 (봄 벚꽃 및 단풍 시즌 추천)',
+                        cost: '공원 무료 / 천수각 입장료 600엔'
+                    },
+                    {
+                        id: 'osaka_usj',
+                        name: '유니버설 스튜디오 재팬 (USJ)',
+                        japaneseName: 'Universal Studios Japan',
+                        tag: '🎢 테마파크',
+                        image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '슈퍼 닌텐도 월드, 해리포터 등 몰입감 최고의 세계적 테마파크',
+                        desc: '마리오 카트를 즐기는 슈퍼 닌텐도 월드와 마법 주문을 외우는 해리포터 위저딩 월드, 해리포터와 미니언즈 등 남녀노소 누구나 즐길 수 있는 최고의 어트랙션 천국입니다.',
+                        address: '大阪府大阪市此花区桜島2-1-33 (2-1-33 Sakurajima, Konohana Ward, Osaka)',
+                        transport: 'JR 몽키선/유메사키선 [유니버설시티역(Universal-City)] 하차 도보 3분',
+                        mapQuery: 'Universal Studios Japan, Osaka',
+                        bestTime: '개장 1시간 전 도착 (사전 닌텐도 확약권/익스프레스 티켓 권장)',
+                        cost: '1일 자유이용권 약 8,600엔~10,400엔 (날짜별 변동)'
+                    }
+                ],
+                food: '타코야키, 오코노미야키, 쿠시카츠(꼬치튀김), 하이볼, 호르몬 구이',
+                season: '사계절 내내 방문하기 좋음 (봄 벚꽃, 가을 산책 추천)',
+                tip: '주요 관광지와 지하철을 무료 이용할 수 있는 주유패스(Osaka Amazing Pass) 활용을 추천합니다.'
+            },
+            {
+                id: 'sapporo',
+                name: '삿포로 & 비에이',
+                englishName: 'Sapporo & Biei',
+                region: '홋카이도 (Hokkaido)',
+                category: 'nature',
+                categoryLabel: '❄️ 대자연 & 설경',
+                image: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '웅장한 설원과 여름의 라벤더 밭, 신선한 해산물과 맥주의 고향',
+                tagline: '겨울에는 하얀 눈꽃 세상, 여름에는 서늘하고 드넓은 꽃밭이 펼쳐지는 대자연',
+                envCards: [
+                    { title: '탁 트인 대자연', desc: '비에이의 언덕, 청의 호수, 드넓은 라벤더 밭 등 압도적 자연미.', icon: 'fa-snowflake' },
+                    { title: '격자형 도심 구조', desc: '오도리 공원을 중심축으로 깨끗하고 정돈된 유럽풍 도시 구획.', icon: 'fa-border-all' },
+                    { title: '풍부한 청정 식재료', desc: '낙농업과 신선한 북방 해산물이 풍부한 미식 환경.', icon: 'fa-cow' }
+                ],
+                attractions: [
+                    {
+                        id: 'sapporo_biei',
+                        name: '비에이 청의 호수 (아오이이케)',
+                        japaneseName: 'Shirogane Blue Pond (青い池)',
+                        tag: '💎 신비로운 에메랄드 호수',
+                        image: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '코발트블루 빛 수면 위 자작나무 고목들이 만들어내는 동화 같은 절경',
+                        desc: '알루미늄 성분의 화산 온천수가 섞이며 자작나무 고목과 어우러져 비현실적인 푸른빛을 내는 호수입니다. 애플 맥북 배경화면으로 지정되며 세계적으로 알려진 대자연 명소입니다.',
+                        address: '北海道上川郡美瑛町白金 (Shirogane, Biei, Kamikawa District, Hokkaido)',
+                        transport: 'JR 비에이역(Biei)에서 도북 버스(Dohoku Bus) 탑승 후 [시로가네 아오이이케] 하차 (약 20분) 또는 원데이 버스 투어 이용',
+                        mapQuery: 'Shirogane Blue Pond, Biei',
+                        bestTime: '맑은 날 오전 10시~오후 2시 (햇살에 푸른 빛이 최고조)',
+                        cost: '입장료 무료 (주차장 이용 시 500엔)'
+                    },
+                    {
+                        id: 'sapporo_otaru',
+                        name: '오타루 운하 & 오르골당',
+                        japaneseName: 'Otaru Canal & Music Box Museum',
+                        tag: '🕯️ 로맨틱 운하 거리',
+                        image: 'https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '석조 창고와 가스등이 켜지는 낭만적인 운하와 아름다운 오르골 소리',
+                        desc: '과거 무역항의 석조 창고들이 이색적인 카페와 공방으로 변모한 오타루입니다. 저녁 무렵 가스등이 켜지는 운하 산책길과 수만 점의 오르골이 수놓아진 오타루 오르골당이 낭만을 더합니다.',
+                        address: '北海道小樽市港町5 (Minatomachi, Otaru, Hokkaido)',
+                        transport: 'JR 삿포로역에서 쾌속 에어포트 열차 탑승 후 [JR 오타루역] 하차 도보 10분',
+                        mapQuery: 'Otaru Canal, Otaru',
+                        bestTime: '17:00~19:00 (노을빛과 가스등 조명이 켜지는 시간)',
+                        cost: '거리 무료 / 운하 크루즈 약 1,800엔'
+                    }
+                ],
+                food: '징기스칸(양고기 구이), 삿포로 미소라메, 스프카레, 대게 요리, 유제품 디저트',
+                season: '겨울 (12~2월 설경/스키) / 여름 (7~8월 꽃밭 & 서늘한 기후)',
+                tip: '비에이와 후라노는 대중교통 이용이 어려울 수 있으므로 버스 일일투어나 렌터카 예약을 권장합니다.'
+            },
+            {
+                id: 'fukuoka',
+                name: '후쿠오카 & 유후인',
+                englishName: 'Fukuoka & Yufuin',
+                region: '규슈 (Kyushu)',
+                category: 'onsen',
+                categoryLabel: '♨️ 힐링 & 온천',
+                image: 'https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '비행시간 1시간 20분! 포장마차 거리와 고즈넉한 료칸 온천 힐링',
+                tagline: '가까운 비행거리, 하카타 라멘의 본고장이자 아기자기한 온천 마을',
+                envCards: [
+                    { title: '온천 온구 & 료칸', desc: '유후인, 벳푸 등 자연 속 온천 가와 고즈넉한 전통 료칸 숙박.', icon: 'fa-hot-tub-person' },
+                    { title: '콤팩트한 도시 동선', desc: '공항에서 시내(하카타)까지 지하철 10분 거리의 뛰어난 접근성.', icon: 'fa-plane-arrival' },
+                    { title: '나카스 야타이(포장마차)', desc: '강변을 따라 형성된 감성 넘치는 야간 포장마차 문화.', icon: 'fa-utensils' }
+                ],
+                attractions: [
+                    {
+                        id: 'fukuoka_yufuin',
+                        name: '유후인 긴린코 호수 & 유노츠보 거리',
+                        japaneseName: 'Kinrin Lake & Yunotsubo Street',
+                        tag: '♨️ 온천 호수 마을',
+                        image: 'https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '아침 물안개가 피어오르는 신비로운 온천 호수와 디저트 상점가',
+                        desc: '호수 바닥에서 따뜻한 온천수와 차가운 생수가 동시 분출하여 물안개가 피어오르는 긴린코 호수입니다. 호수로 연결된 유노츠보 거리에서 금상 고로케, B-speak 롤케이크를 맛보며 산책하기 좋습니다.',
+                        address: '大分県由布市湯布院町川上1561-1 (Kawakami, Yufuin, Yufu, Oita)',
+                        transport: 'JR 유후인역(Yufuin)에서 유노츠보 거리 따라 도보 약 20분 (산책 코스)',
+                        mapQuery: 'Kinrin Lake, Yufuin',
+                        bestTime: '이른 아침 (물안개 감상) 또는 11:00~15:00 (상점가 산책)',
+                        cost: '무료 관람'
+                    },
+                    {
+                        id: 'fukuoka_nakasu',
+                        name: '나카스 야타이 포장마차 거리',
+                        japaneseName: 'Nakasu Yatai Stalls',
+                        tag: '🍜 야간 포장마차 감성',
+                        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '나카스 강변을 따라 펼쳐지는 일상의 활력, 라멘과 하이볼 한 잔',
+                        desc: '후쿠오카 나카스 강변길을 따라 줄지어 서는 일본 전통 운치 있는 실외 야타이(포장마차) 거리입니다. 돈코츠 라멘, 야키토리, 명란구이 등을 강변 야경과 함께 만끽할 수 있습니다.',
+                        address: '福岡県福岡市博多区中洲8 (8 Nakasu, Hakata Ward, Fukuoka)',
+                        transport: '후쿠오카 지하철 공항선 [나카스카와바타역] 1번 출구 도보 5분',
+                        mapQuery: 'Nakasu Yatai Stalls, Fukuoka',
+                        bestTime: '오후 19:00~23:00 (야간 분위기 피크 타임)',
+                        cost: '메뉴당 약 600엔~1,500엔 내외'
+                    }
+                ],
+                food: '돈코츠 라멘(하카타 라멘), 모츠나베(곱창전골), 미즈타키(닭한마리), 명란젓',
+                season: '가을~겨울 (11월~3월 온천욕 최적기)',
+                tip: '유후인 버스(유후인호)나 특급열차(유후인노모리)는 인기가 높아 출발 최소 1달 전 예약을 추천합니다.'
+            },
+            {
+                id: 'okinawa',
+                name: '오키나와',
+                englishName: 'Okinawa',
+                region: '오키나와 (Okinawa)',
+                category: 'resort',
+                categoryLabel: '🏖️ 휴양 & 에메랄드 바다',
+                image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '동양의 하와이! 에메랄드빛 해변과 류큐 왕국의 독자적 휴양 문화',
+                tagline: '스노클링, 드라이브 코스, 미국풍 거리가 어우러진 남국 아열대 리조트',
+                envCards: [
+                    { title: '에메랄드 해변 & 코랄', desc: '투명한 바다, 화이트 샌드, 다양한 해양 액티비티 환경.', icon: 'fa-umbrella-beach' },
+                    { title: '해안 드라이브 코스', desc: '코우리 대교, 만좌모 등 탁 트인 바다 절경을 달리는 도로.', icon: 'fa-car-side' },
+                    { title: '이국적 미·류큐 문화', desc: '아메리칸 빌리지와 류큐 왕국 유적의 독특한 이국적 분위기.', icon: 'fa-compact-disc' }
+                ],
+                attractions: [
+                    {
+                        id: 'okinawa_churaumi',
+                        name: '츄라우미 수족관 (Churaumi Aquarium)',
+                        japaneseName: 'Okinawa Churaumi Aquarium',
+                        tag: '🐋 고래상어 대형 수조',
+                        image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '8,700톤 거대 수조 속에서 헤엄치는 대형 고래상어와 쥐가오리',
+                        desc: '세계 최대급 아크릴 유리 수조 "쿠로시오 바다"에서 고래상어와 만타가오리가 우아하게 유헤엄치는 기적 같은 장면을 감상할 수 있습니다. 옥외 돌고래 쇼(오키짱 극장)도 무료로 즐길 수 있습니다.',
+                        address: '沖縄県国頭郡本部町石川424 (424 Ishikawa, Motobu, Kunigami District, Okinawa)',
+                        transport: '나하 공항에서 얌바루 급행버스 탑승 후 [기념공원전(수족관)] 하차 (약 2시간) 또는 렌터카 이용',
+                        mapQuery: 'Okinawa Churaumi Aquarium',
+                        bestTime: '15:00 고래상어 먹이주기 쇼 타임',
+                        cost: '성인 2,180엔 (16시 이후 할인권 있음)'
+                    },
+                    {
+                        id: 'okinawa_manzamo',
+                        name: '만좌모 (萬座毛)',
+                        japaneseName: 'Manzamo Cliff',
+                        tag: '🌊 코끼리 바위 절벽',
+                        image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '만 명이 앉을 수 있는 잔디밭과 코끼리 코 모양의 기암절벽 절경',
+                        desc: '류큐 국왕 국왕이 "만 명이 앉을 수 있는 들판"이라 칭송한 융기 코랄 절벽입니다. 에메랄드빛 바다파도가 깎아 만든 코끼리 코 형태의 기암과 수평선 노을이 아름다운 드라이브 필수 스팟입니다.',
+                        address: '沖縄県国頭郡恩納村恩納 (Onna, Kunigami District, Okinawa)',
+                        transport: '나하 버스터미널에서 120번 버스 탑승 후 [온나손 役場前] 하차 도보 15분 또는 렌터카 이용',
+                        mapQuery: 'Manzamo, Okinawa',
+                        bestTime: '해질녘 (수평선 석양 감상)',
+                        cost: '시설 및 시설 관람료 100엔'
+                    }
+                ],
+                food: '오키나와 소바, 오키나와 흑돼지(아구), 타코라이스, 블루씰 아이스크림, 오리온 생맥주',
+                season: '봄~가을 (5월~10월 수영 및 해양 스포츠 최적기)',
+                tip: '대중교통이 제한적이므로 렌터카 여행이 필수적입니다 (국제운전면허증 사전 준비 필요).'
+            },
+            {
+                id: 'hakone',
+                name: '하코네',
+                englishName: 'Hakone',
+                region: '관동 (Kanto)',
+                category: 'onsen',
+                categoryLabel: '♨️ 온천 & 후지산 조망',
+                image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '도쿄 근교의 국립공원! 후지산 전경과 아시노코 호수, 유황 온천',
+                tagline: '로프웨이, 등산열차, 해적선을 타며 후지산을 감상하는 최고의 온천 리조트',
+                envCards: [
+                    { title: '화산 지형 & 유황천', desc: '오와쿠다니 화산 계곡의 자욱한 연기와 검은 달걀.', icon: 'fa-volcano' },
+                    { title: '호수 & 후지산 뷰', desc: '아시노코 호수 위 해적선에서 감상하는 웅장한 후지산 전경.', icon: 'fa-mountain' },
+                    { title: '자연 속 미술관', desc: '하코네 조각의 숲 미술관 등 자연과 조화된 문화 공간.', icon: 'fa-palette' }
+                ],
+                attractions: [
+                    {
+                        id: 'hakone_owakudani',
+                        name: '하코네 오와쿠다니 (대涌谷)',
+                        japaneseName: 'Owakudani Valley',
+                        tag: '🌋 활화산 유황계곡',
+                        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '자욱한 유황 증기와 수명을 7년 늘려준다는 하코네 명물 검은 달걀',
+                        desc: '약 3,000년 전 화산 폭발로 만들어진 지열 계곡입니다. 하코네 로프웨이를 타고 올라가며 내려다보는 자욱한 증기 연기와 후지산의 위용이 압권이며, 온천 수증기에서 삶은 쿠로타마고(검은 달걀) 시식이 유명합니다.',
+                        address: '神奈川県足柄下郡箱根町仙石原1251 (1251 Sengokuhara, Hakone, Ashigarashimo District, Kanagawa)',
+                        transport: '하코네 등산케이블카 [소운잔역]에서 하코네 로프웨이 환승 후 [오와쿠다니역] 하차',
+                        mapQuery: 'Owakudani, Hakone',
+                        bestTime: '맑고 바람이 적은 오전 (후지산 조망 최적)',
+                        cost: '로프웨이 운임 (하코네 프리패스 사용 가능)'
+                    }
+                ],
+                food: '오와쿠다니 검은 달걀(쿠로타마고), 하코네 메밀국수(소바), 온천 만두',
+                season: '가을 (10~11월 단풍과 후지산 선명함) / 겨울 (온천욕)',
+                tip: '신주쿠에서 출발할 경우 교통수단을 무제한 이용할 수 있는 하코네 프리패스를 이용하세요.'
+            },
+            {
+                id: 'nara',
+                name: '나라',
+                englishName: 'Nara',
+                region: '간사이 (Kansai)',
+                category: 'culture',
+                categoryLabel: '🦌 역사 & 사슴 자연',
+                image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
+                shortDesc: '자유롭게 거니는 사슴들과 거대한 대불상이 반겨주는 평화로운 고도',
+                tagline: '사람과 사슴이 함께 어우러지는 고즈넉하고 평화로운 원시림 공원 환경',
+                envCards: [
+                    { title: '사슴들의 안식처', desc: '1,000마리가 넘는 야생 사슴들이 공원과 길가를 자유롭게 다니는 풍경.', icon: 'fa-paw' },
+                    { title: '웅장한 불교 유적', desc: '세계 최대 목조건물 도다이지와 초대형 불상.', icon: 'fa-om' },
+                    { title: '울창한 원시림', desc: '가스가타이샤 신사 주변 수백 년 된 등불과 삼림욕 코스.', icon: 'fa-leaf' }
+                ],
+                attractions: [
+                    {
+                        id: 'nara_park',
+                        name: '나라 사슴 공원 & 도다이지 (동대사)',
+                        japaneseName: 'Nara Park & Tōdai-ji',
+                        tag: '🦌 야생 사슴 & 대불상',
+                        image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80',
+                        shortDesc: '사슴들에게 센베 과자를 주며 인사하고 세계 최대 목조 대불전 감상',
+                        desc: '1,300여 마리의 순한 야생 사슴들이 자유롭게 거니는 공원입니다. 공원 안쪽의 도다이지(동대사)는 세계 최대의 목조건물로 높이 15m의 웅장한 청동 대불상이 모셔져 있습니다.',
+                        address: '奈良県奈良市雑司町406-1 (406-1 Zoshicho, Nara, Nara Prefecture)',
+                        transport: '킨테츠 나라선 [킨테츠나라역(Kintetsu-Nara)] 2번 출구 도보 10분 또는 JR 나라역 도보 20분',
+                        mapQuery: 'Todai-ji, Nara',
+                        bestTime: '오전 9:00~11:00 (사슴들이 활발하게 교감하는 시간)',
+                        cost: '공원 무료 / 사슴 센베 200엔 / 도다이지 대웅전 600엔'
+                    }
+                ],
+                food: '감잎 초밥(카키노하스시), 나라즈케(장아찌), 가키고리(빙수)',
+                season: '봄 (사슴과 벚꽃) / 가을 (단풍 오솔길)',
+                tip: '오사카나 교토에서 킨테츠 전철로 30~40분이면 올 수 있어 당일치기 여행으로 최적입니다.'
+            }
+        ];
+
+        let currentCityId = null;
+        let currentFilter = 'all';
+
+        // Render City Cards Grid
+        function renderCities(cities) {
+            const grid = document.getElementById('cityGrid');
+            const badge = document.getElementById('cityCountBadge');
+            if (badge) badge.textContent = `${cities.length}개 도시`;
+
+            if (cities.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200">
+                        <i class="fa-solid fa-magnifying-glass text-4xl mb-3 block text-slate-300"></i>
+                        <p class="text-sm font-medium text-slate-500">검색 조건에 일치하는 도시가 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = cities.map(city => `
+                <div onclick="openModal('${city.id}')" 
+                     class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col group">
+                    <div class="relative h-44 overflow-hidden bg-slate-800">
+                        <img src="${city.image}" alt="${city.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                        <span class="absolute top-3 left-3 text-[11px] font-bold px-2.5 py-1 bg-white/90 backdrop-blur-md text-slate-800 rounded-full shadow-sm">
+                            ${city.region}
+                        </span>
+                        <span class="absolute top-3 right-3 text-[11px] font-bold px-2.5 py-1 bg-red-600/90 text-white rounded-full shadow-sm">
+                            ${city.categoryLabel.split(' ')[0]} ${city.categoryLabel.split(' ')[1] || ''}
+                        </span>
+                        <div class="absolute bottom-3 left-3 right-3 text-white">
+                            <h3 class="text-xl font-extrabold flex items-baseline gap-1.5">
+                                ${city.name} <span class="text-xs font-normal opacity-80 font-mono">${city.englishName}</span>
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col justify-between flex-grow">
+                        <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-3 font-normal">
+                            ${city.shortDesc}
+                        </p>
+                        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-brand-red group-hover:translate-x-1 transition-transform">
+                            <span>상세 환경 & 명소 보기</span>
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter by Category
+        function filterCities(category, event) {
+            currentFilter = category;
+            
+            // Update Active Filter UI Buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-white', 'text-slate-900', 'shadow', 'active-filter');
+                btn.classList.add('bg-slate-800', 'text-slate-300');
+            });
+
+            if (event && event.target) {
+                event.target.classList.remove('bg-slate-800', 'text-slate-300');
+                event.target.classList.add('bg-white', 'text-slate-900', 'shadow', 'active-filter');
+            }
+
+            applyFilters();
+        }
+
+        // Apply Search & Category Filters Combined
+        function applyFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+            const filtered = citiesData.filter(city => {
+                const matchesCategory = (currentFilter === 'all') || (city.category === currentFilter);
+                const matchesSearch = city.name.toLowerCase().includes(searchTerm) ||
+                                      city.englishName.toLowerCase().includes(searchTerm) ||
+                                      city.region.toLowerCase().includes(searchTerm) ||
+                                      city.shortDesc.toLowerCase().includes(searchTerm) ||
+                                      city.food.toLowerCase().includes(searchTerm);
+
+                return matchesCategory && matchesSearch;
+            });
+
+            renderCities(filtered);
+        }
+
+        // Open City Detail Modal
+        function openModal(cityId) {
+            const city = citiesData.find(c => c.id === cityId);
+            if (!city) return;
+
+            currentCityId = cityId;
+
+            // Fill Hero
+            document.getElementById('modalHero').style.backgroundImage = `url('${city.image}')`;
+            document.getElementById('modalRegion').textContent = city.region;
+            document.getElementById('modalVibeBadge').textContent = city.categoryLabel;
+            document.getElementById('modalTitle').textContent = `${city.name} (${city.englishName})`;
+            document.getElementById('modalTagline').textContent = city.tagline;
+
+            // Fill Environment Grid
+            const envGrid = document.getElementById('modalEnvGrid');
+            envGrid.innerHTML = city.envCards.map(env => `
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center gap-2 mb-1.5 text-brand-red font-bold text-xs sm:text-sm">
+                        <i class="fa-solid ${env.icon} text-base"></i>
+                        <span>${env.title}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">${env.desc}</p>
+                </div>
+            `).join('');
+
+            // Fill Interactive Attractions
+            const attractionsContainer = document.getElementById('modalAttractions');
+            attractionsContainer.innerHTML = city.attractions.map(attr => `
+                <div onclick="openSpotModal('${city.id}', '${attr.id}')" 
+                     class="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-md hover:border-sky-400 transition-all cursor-pointer group flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-[11px] font-bold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md group-hover:bg-sky-50 group-hover:text-sky-700 transition-colors">
+                                ${attr.tag || '📍 대표 명소'}
+                            </span>
+                            <span class="text-[11px] font-semibold text-sky-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-1">
+                                길안내 & 보기 <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </span>
+                        </div>
+                        <h4 class="font-extrabold text-slate-900 text-sm mb-1 group-hover:text-sky-600 transition-colors">
+                            ${attr.name}
+                        </h4>
+                        <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">
+                            ${attr.shortDesc || attr.desc}
+                        </p>
+                    </div>
+                    <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                        <span><i class="fa-solid fa-train-subway text-indigo-400 mr-1"></i>교통편 보기</span>
+                        <span class="text-slate-400 font-mono">${attr.japaneseName || ''}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Fill Food, Season, Tip
+            document.getElementById('modalFood').textContent = city.food;
+            document.getElementById('modalSeason').textContent = city.season;
+            document.getElementById('modalTip').textContent = city.tip;
+
+            // Show Modal
+            const modal = document.getElementById('cityModal');
+            const modalContainer = document.getElementById('modalContainer');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modalContainer.classList.remove('scale-95');
+            modalContainer.classList.add('scale-100');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close City Modal
+        function closeModal() {
+            const modal = document.getElementById('cityModal');
+            const modalContainer = document.getElementById('modalContainer');
+
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalContainer.classList.remove('scale-100');
+            modalContainer.classList.add('scale-95');
+            document.body.style.overflow = '';
+        }
+
+        // Open Spot Detail Modal with Transport Navigation & Google Maps
+        function openSpotModal(cityId, spotId) {
+            const city = citiesData.find(c => c.id === cityId);
+            if (!city) return;
+            const spot = city.attractions.find(a => a.id === spotId);
+            if (!spot) return;
+
+            document.getElementById('spotImage').src = spot.image || city.image;
+            document.getElementById('spotTag').textContent = spot.tag || '관광명소';
+            document.getElementById('spotJapaneseName').textContent = spot.japaneseName || '';
+            document.getElementById('spotTitle').textContent = spot.name;
+            document.getElementById('spotDesc').textContent = spot.desc;
+            document.getElementById('spotTransport').innerHTML = spot.transport;
+            document.getElementById('spotAddress').textContent = spot.address;
+            document.getElementById('spotBestTime').textContent = spot.bestTime || '상시';
+            document.getElementById('spotCost').textContent = spot.cost || '무료';
+
+            // Set Google Maps Links
+            const query = encodeURIComponent(spot.mapQuery || `${spot.name} ${city.name}`);
+            const addressQuery = encodeURIComponent(spot.address || spot.name);
+            
+            document.getElementById('spotMapSearchBtn').href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+            document.getElementById('spotNaviBtn').href = `https://www.google.com/maps/dir/?api=1&destination=${addressQuery}`;
+
+            // Show Spot Modal
+            const spotModal = document.getElementById('spotModal');
+            const spotContainer = document.getElementById('spotModalContainer');
+
+            spotModal.classList.remove('opacity-0', 'pointer-events-none');
+            spotContainer.classList.remove('scale-95');
+            spotContainer.classList.add('scale-100');
+        }
+
+        // Close Spot Modal
+        function closeSpotModal() {
+            const spotModal = document.getElementById('spotModal');
+            const spotContainer = document.getElementById('spotModalContainer');
+
+            spotModal.classList.add('opacity-0', 'pointer-events-none');
+            spotContainer.classList.remove('scale-100');
+            spotContainer.classList.add('scale-95');
+        }
+
+        // Global Keyboard Event Listener
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const spotModal = document.getElementById('spotModal');
+                if (spotModal && !spotModal.classList.contains('opacity-0')) {
+                    closeSpotModal();
+                } else {
+                    closeModal();
+                }
+            }
+        });
+
+        // Global Backdrop Click Listeners
+        document.getElementById('spotModal').addEventListener('click', (e) => {
+            if (e.target.id === 'spotModal') closeSpotModal();
+        });
+
+        document.getElementById('cityModal').addEventListener('click', (e) => {
+            if (e.target.id === 'cityModal') closeModal();
+        });
+
+        // Search Input Listener
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        // Initialize App on Load
+        window.onload = function () {
+            renderCities(citiesData);
+        };
+    </script>
+</body>
+</html>

@@ -56,23 +56,34 @@
 
     <!-- Header Navbar -->
     <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-3">
                 <span class="text-2xl">🇯🇵</span>
                 <div>
                     <h1 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                        Japan Travel Explorer
+                        Japan Travel & Food
                         <span class="text-xs font-semibold px-2 py-0.5 bg-red-100 text-brand-red rounded-full">Interactive</span>
                     </h1>
-                    <p class="text-xs text-slate-500 hidden sm:block">클릭하여 각 도시의 매력과 주요 환경을 탐색해보세요</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2">
+            <!-- Top Navigation Tabs -->
+            <nav class="flex items-center gap-1 sm:gap-2 bg-slate-100 p-1 rounded-full border border-slate-200">
+                <button id="navCityBtn" onclick="switchTab('city')" 
+                        class="px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all bg-white text-slate-900 shadow-sm">
+                    <i class="fa-solid fa-city mr-1 text-red-500"></i> 도시별 탐색기
+                </button>
+                <button id="navMenuBtn" onclick="switchTab('menu')" 
+                        class="px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all text-slate-600 hover:text-slate-900">
+                    <i class="fa-solid fa-utensils mr-1 text-amber-500"></i> 오늘 뭐 먹지? - 메뉴 정하기
+                </button>
+            </nav>
+
+            <div class="hidden md:flex items-center gap-2">
                 <div class="relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     <input type="text" id="searchInput" placeholder="도시 또는 키워드 검색..." 
-                           class="pl-9 pr-4 py-1.5 text-sm bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500/50 w-36 sm:w-60 transition-all">
+                           class="pl-9 pr-4 py-1.5 text-sm bg-slate-100 border border-slate-200 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500/50 w-36 sm:w-52 transition-all">
                 </div>
             </div>
         </div>
@@ -80,47 +91,112 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
         
-        <!-- Hero Tagline & Stats Banner -->
-        <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-black pointer-events-none">JAPAN</div>
-            <div class="relative z-10 max-w-2xl">
-                <span class="inline-block px-3 py-1 bg-red-600/80 text-white text-xs font-bold rounded-full mb-3 tracking-wider">나에게 딱 맞는 여행지 찾기</span>
-                <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight mb-3">
-                    일본 도시별 주요 환경과<br><span class="text-sky-400">명소·테마</span>를 한눈에 둘러보세요!
-                </h2>
-                <p class="text-slate-300 text-sm sm:text-base mb-4">
-                    도심의 화려한 야경부터 전통 가옥 거리, 온천 마을, 대자연, 휴양지까지 도시 카드를 클릭하면 상세 분위기와 환경을 미리 확인할 수 있습니다.
-                </p>
-            </div>
+        <!-- VIEW 1: CITY EXPLORER PAGE -->
+        <div id="cityExplorerView" class="flex flex-col gap-6">
+            <!-- Hero Tagline & Stats Banner -->
+            <section class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-black pointer-events-none">JAPAN</div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-block px-3 py-1 bg-red-600/80 text-white text-xs font-bold rounded-full mb-3 tracking-wider">나에게 딱 맞는 여행지 찾기</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight mb-3">
+                        일본 도시별 주요 환경과<br><span class="text-sky-400">명소·테마</span>를 한눈에 둘러보세요!
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base mb-4">
+                        도심의 화려한 야경부터 전통 가옥 거리, 온천 마을, 대자연, 휴양지까지 도시 카드를 클릭하면 상세 분위기와 환경을 미리 확인할 수 있습니다.
+                    </p>
+                </div>
 
-            <!-- Quick Filter Chips -->
-            <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 items-center">
-                <span class="text-xs text-slate-400 font-medium mr-1"><i class="fa-solid fa-filter mr-1"></i>테마 필터:</span>
-                <button onclick="filterCities('all')" class="filter-btn active-filter text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-white text-slate-900 shadow">전체 보기</button>
-                <button onclick="filterCities('urban')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">🏙️ 현대 도시 & 쇼핑</button>
-                <button onclick="filterCities('culture')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">⛩️ 역사 & 전통</button>
-                <button onclick="filterCities('onsen')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">♨️ 힐링 & 온천</button>
-                <button onclick="filterCities('nature')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">❄️ 대자연 & 설경</button>
-                <button onclick="filterCities('resort')" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">🏖️ 휴양 & 에메랄드 바다</button>
-            </div>
-        </section>
+                <!-- Quick Filter Chips -->
+                <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap gap-2 items-center">
+                    <span class="text-xs text-slate-400 font-medium mr-1"><i class="fa-solid fa-filter mr-1"></i>테마 필터:</span>
+                    <button onclick="filterCities('all', event)" class="filter-btn active-filter text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-white text-slate-900 shadow">전체 보기</button>
+                    <button onclick="filterCities('urban', event)" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">🏙️ 현대 도시 & 쇼핑</button>
+                    <button onclick="filterCities('culture', event)" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">⛩️ 역사 & 전통</button>
+                    <button onclick="filterCities('onsen', event)" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">♨️ 힐링 & 온천</button>
+                    <button onclick="filterCities('nature', event)" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">❄️ 대자연 & 설경</button>
+                    <button onclick="filterCities('resort', event)" class="filter-btn text-xs px-3 py-1.5 rounded-full font-medium transition-all bg-slate-800 hover:bg-slate-700 text-slate-300">🏖️ 휴양 & 에메랄드 바다</button>
+                </div>
+            </section>
 
-        <!-- City Cards Grid Section -->
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-location-dot text-brand-red"></i>
-                    주요 추천 도시 목록
-                    <span id="cityCountBadge" class="text-xs bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">8개 도시</span>
-                </h3>
-                <span class="text-xs text-slate-500"><i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i>카드를 클릭하면 상세 환경이 열립니다</span>
-            </div>
+            <!-- City Cards Grid Section -->
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-brand-red"></i>
+                        주요 추천 도시 목록
+                        <span id="cityCountBadge" class="text-xs bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">8개 도시</span>
+                    </h3>
+                    <span class="text-xs text-slate-500"><i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i>카드를 클릭하면 상세 환경이 열립니다</span>
+                </div>
 
-            <!-- Cards Container -->
-            <div id="cityGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <!-- Dynamically Populated via JavaScript -->
-            </div>
-        </section>
+                <!-- Cards Container -->
+                <div id="cityGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <!-- Dynamically Populated via JavaScript -->
+                </div>
+            </section>
+        </div>
+
+        <!-- VIEW 2: TODAY'S MENU PICKER PAGE -->
+        <div id="menuPickerView" class="hidden flex-col gap-6">
+            
+            <!-- Food Hero & Random Roulette Banner -->
+            <section class="bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl font-black pointer-events-none">DELICIOUS</div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-full mb-3 tracking-wider">
+                        🍱 일본 현지 미식 결정 장애 해결사
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-black leading-tight mb-3">
+                        오늘 일본에서 <span class="text-yellow-300">무엇을 먹을지</span> 고민되시나요?
+                    </h2>
+                    <p class="text-amber-100 text-sm sm:text-base mb-6">
+                        라멘부터 스시, 오코노미야키, 스프카레, 곱창전골까지! 원하는 카테고리를 골라보거나 랜덤 룰렛으로 오늘의 완벽한 한 끼 메뉴를 정해보세요.
+                    </p>
+
+                    <!-- Roulette Trigger Card -->
+                    <div class="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-4 text-left">
+                            <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white text-amber-600 flex items-center justify-center text-3xl shadow-md shrink-0">
+                                🎲
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-base sm:text-lg">오늘의 메뉴 랜덤 뽑기 룰렛</h3>
+                                <p class="text-xs sm:text-sm text-amber-100">결정 장애 해소! 버튼을 누르면 추천 메뉴를 뽑아드립니다.</p>
+                            </div>
+                        </div>
+                        <button onclick="spinFoodRoulette()" class="w-full sm:w-auto px-6 py-3.5 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-extrabold rounded-2xl shadow-lg transition-all active:scale-95 whitespace-nowrap text-sm sm:text-base">
+                            <i class="fa-solid fa-dice mr-1"></i> 랜덤 메뉴 뽑기!
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Food Category Filters & Grid -->
+            <section>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-utensils text-amber-600"></i>
+                        대표 일본 요리 메뉴 추천
+                        <span id="foodCountBadge" class="text-xs bg-slate-200 text-slate-700 font-semibold px-2 py-0.5 rounded-full">10개 메뉴</span>
+                    </h3>
+
+                    <!-- Food Filter Buttons -->
+                    <div class="flex flex-wrap gap-1.5">
+                        <button onclick="filterFoods('all', event)" class="food-filter-btn active-food-filter text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-slate-900 text-white shadow">전체</button>
+                        <button onclick="filterFoods('ramen', event)" class="food-filter-btn text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">🍜 라멘/면류</button>
+                        <button onclick="filterFoods('sushi', event)" class="food-filter-btn text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">🍣 초밥/해산물</button>
+                        <button onclick="filterFoods('grill', event)" class="food-filter-btn text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">🍢 구이/철판/튀김</button>
+                        <button onclick="filterFoods('stew', event)" class="food-filter-btn text-xs px-3 py-1.5 rounded-full font-bold transition-all bg-white text-slate-700 hover:bg-slate-100 border border-slate-200">🍲 전골/카레</button>
+                    </div>
+                </div>
+
+                <!-- Food Cards Grid -->
+                <div id="foodGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </section>
+        </div>
+
     </main>
 
     <!-- City Detail Modal -->
@@ -291,214 +367,214 @@
     </div>
 
     <script>
-        // Expanded Data for Cities with Detailed Spot Navigation
-        const citiesData = [
+        // Food Database for "오늘 뭐 먹지?" Page
+        const foodData = [
             {
-                id: 'tokyo',
-                name: '도쿄',
-                englishName: 'Tokyo',
-                region: '관동 (Kanto)',
-                category: 'urban',
-                categoryLabel: '🏙️ 현대 도시 & 쇼핑',
-                image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80',
-                shortDesc: '네온사인 번화가와 첨단 문화, 고즈넉한 정원이 절묘하게 조화된 매가시티',
-                tagline: '세계 최대 규모의 대도시와 다채로운 서브컬처, 명품 쇼핑의 천국',
-                envCards: [
-                    { title: '도심 스카이라인', desc: '초고층 마천루와 시부야 스크램블, 신주쿠의 화려한 네온 상가가 가득합니다.', icon: 'fa-building-ngo' },
-                    { title: '대중교통 네트워크', desc: '세계에서 가장 촘촘한 지하철/철도망으로 근교까지 원스톱 이동 가능.', icon: 'fa-train-subway' },
-                    { title: '공원 & 사찰', desc: '아사쿠사 센소지, 메이지신궁, 신주쿠 교엔 등 조용하고 넓은 녹지가 공존.', icon: 'fa-torii-gate' }
-                ],
-                attractions: [
-                    {
-                        id: 'tokyo_sensoji',
-                        name: '아사쿠사 센소지 (浅草寺)',
-                        japaneseName: 'Sensō-ji',
-                        tag: '⛩️ 고풍 사찰',
-                        image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '도쿄에서 가장 오래된 고풍스러운 상징 사찰과 전통 상점가 나카미세도리',
-                        desc: '645년에 창건된 도쿄에서 가장 역사가 오래된 사원입니다. 입구의 대형 붉은 제등 "가미나리몬"을 지나 사찰 본당까지 연결된 250m 길이의 나카미세 상가에서는 전통 과자와 아기자기한 기념품을 둘러볼 수 있습니다.',
-                        address: '東京都台東区浅草2-3-1 (2-3-1 Asakusa, Taito City, Tokyo)',
-                        transport: '도쿄 메트로 긴자선(Ginza Line) 또는 도에이 아사쿠사선(Asakusa Line) [아사쿠사역] 1번/3번 출구에서 도보 약 5분',
-                        mapQuery: 'Sensō-ji, Tokyo',
-                        bestTime: '오전 8시 이전 (한적한 산책) 또는 19:00 이후 (조명 야경)',
-                        cost: '경내 입장 무료 (운세 오미쿠지 100엔)'
-                    },
-                    {
-                        id: 'tokyo_shibuya',
-                        name: '시부야 스크램블 & 시부야 스카이',
-                        japaneseName: 'Shibuya Sky & Scramble Crossing',
-                        tag: '🏙️ 랜드마크 / 전망대',
-                        image: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '수천 명이 동시에 건너는 활력 넘치는 교차로와 229m 도심 옥상 전망대',
-                        desc: '세계에서 가장 붐비는 교차로로 손꼽히는 시부야 스크램블 교차로와, 시부야 스크램블 스퀘어 건물 옥상 229m 높이에서 도쿄 전경 및 후지산까지 한눈에 감상할 수 있는 시부야 스카이가 최고의 야경 포인트입니다.',
-                        address: '東京都渋谷区渋谷2-24-12 (2-24-12 Shibuya, Shibuya City, Tokyo)',
-                        transport: 'JR 야마노테선/이노카시라선/도쿄메트로 [시부야역] B6번 출구 직결',
-                        mapQuery: 'Shibuya Sky, Tokyo',
-                        bestTime: '일몰 1시간 전~야경 타임 (사전 온라인 티켓 예약 필수)',
-                        cost: '시부야 스카이 성인 약 2,200엔~2,500엔'
-                    },
-                    {
-                        id: 'tokyo_meiji',
-                        name: '메이지 신궁 & 하라주쿠',
-                        japaneseName: 'Meiji Jingu & Harajuku',
-                        tag: '🌲 도심 울창한 숲',
-                        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '도쿄 한복판에 위치한 70만㎡ 규모의 인공 원시림과 트렌디한 타케시타 도리',
-                        desc: '도심 속 울창한 삼림욕을 즐길 수 있는 신사입니다. 입구의 웅장한 목조 도리이를 지나 자갈길을 걸으면 도쿄 도심이라는 사실을 잊게 만듭니다. 신사 바로 앞 하라주쿠 타케시타 도리에서는 스트리트 패션과 디저트를 즐길 수 있습니다.',
-                        address: '東京都渋谷区代々木神園町1-1 (1-1 Yoyogikamizonocho, Shibuya City, Tokyo)',
-                        transport: 'JR 야마노테선 [하라주쿠역] 표가지 출구 도보 1분 또는 도쿄메트로 [메이지진구마에역] 2번 출구',
-                        mapQuery: 'Meiji Jingu, Tokyo',
-                        bestTime: '오전 9시~11시 (선선하고 호젓한 울림길 산책)',
-                        cost: '신궁 입장 무료 (내원 정원 관람 시 500엔)'
-                    },
-                    {
-                        id: 'tokyo_tower',
-                        name: '도쿄 타워 (Tokyo Tower)',
-                        japaneseName: 'Tokyo Tower',
-                        tag: '🗼 야경 낭만',
-                        image: 'https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '도쿄의 영원한 낭만 상징, 붉은색 철탑과 아카바네바시 야경 스팟',
-                        desc: '1958년 완공된 높이 333m의 철탑으로 레트로한 감성과 낭만적인 밤 풍경을 선사합니다. 메인 데크(150m)와 탑 데크(250m) 전망대에서 도쿄의 환상적인 밤하늘을 조망할 수 있습니다.',
-                        address: '東京都港区芝公園4-2-8 (4-2-8 Shibakoen, Minato City, Tokyo)',
-                        transport: '도에이 오에도선 [아카바네바시역] 중문출구 도보 5분 / 도쿄 메트로 히비야선 [카미야초역] 1번 출구 도보 7분',
-                        mapQuery: 'Tokyo Tower, Tokyo',
-                        bestTime: '해질녘~22:00 (조명점등 라이트업 감상)',
-                        cost: '메인데크 성인 1,200엔 / 탑데크 투어 3,000엔'
-                    }
-                ],
-                food: '스시(초밥), 몬자야키, 아키하바라 이자카야, 도쿄식 라멘, 디저트 카페',
-                season: '봄 (3~4월 벚꽃 시즌) / 가을 (10~11월 선선한 날씨)',
-                tip: 'Suica나 Pasmo 실물/애플페이 교통카드를 미리 등록해두면 지하철 이동과 편의점 결제가 매우 편리합니다.'
+                id: 'tonkotsu_ramen',
+                name: '돈코츠 라멘 (Tonkotsu Ramen)',
+                category: 'ramen',
+                region: '후쿠오카 (하카타)',
+                icon: '🍜',
+                image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '진하고 고소한 돼지사골 육수 + 쫄깃한 생면',
+                desc: '돼지 뼈를 오랜 시간 우려내 진하고 깊은 맛을 내는 구수한 국물 라멘. 차슈와 차조기, 생강을 곁들여 먹는 맛이 일품입니다.',
+                pairing: '시원한 오리온/아사히 생맥주 & 교자(군만두)',
+                recommendCity: '후쿠오카, 도쿄, 오사카 전역'
             },
             {
-                id: 'kyoto',
-                name: '교토',
-                englishName: 'Kyoto',
-                region: '간사이 (Kansai)',
-                category: 'culture',
-                categoryLabel: '⛩️ 역사 & 전통',
-                image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
-                shortDesc: '천년 고도(古都)의 숨결, 유네스코 세계유산과 목조 가옥이 보존된 전통 도심',
-                tagline: '붉은 도리이와 대나무 숲, 고즈넉한 젠(Zen) 정원이 펼쳐진 문화의 중심',
-                envCards: [
-                    { title: '전통 목조 건축물', desc: '기온 거리의 마치야(전통 가옥)와 수많은 사찰, 신사가 보존되어 있습니다.', icon: 'fa-house-chimney-window' },
-                    { title: '자연과의 조화', desc: '아라시야마 대나무 숲과 카모강 수변 산책로가 시내 중심과 인접.', icon: 'fa-tree' },
-                    { title: '고요함과 정운', desc: '다도 문화와 정갈한 가이세키 요리를 즐길 수 있는 고요한 분위기.', icon: 'fa-spa' }
-                ],
-                attractions: [
-                    {
-                        id: 'kyoto_fushimi',
-                        name: '후시미 이나리 신사 (여우신사)',
-                        japaneseName: 'Fushimi Inari Taisha',
-                        tag: '⛩️ 주황빛 붉은 도리이',
-                        image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '산기슭을 따라 붉은 도리이 수천 개가 이어지는 신비로운 신사 산책로',
-                        desc: '곡식과 사업 번창을 기원하는 이나리 신사의 본산입니다. "센본 도리이"라고 불리는 붉은 도리이 터널이 산 정상까지 4km 가량 연결되어 있으며, 게이샤의 추억 영화 촬영지로도 유명을 얻었습니다.',
-                        address: '京都府京都市伏見区深草薮ノ内町68 (68 Fukakusa Yabunouchicho, Fushimi Ward, Kyoto)',
-                        transport: 'JR 나라선 [이나리역(Inari Station)] 하차 직후 정문 연결 (교토역에서 JR로 5분)',
-                        mapQuery: 'Fushimi Inari Taisha, Kyoto',
-                        bestTime: '오전 7:00~8:30 (관광객이 몰리기 전 차분한 분위기)',
-                        cost: '입장료 무료 (24시간 자유 개방)'
-                    },
-                    {
-                        id: 'kyoto_kiyomizu',
-                        name: '기요미즈데라 (청수사)',
-                        japaneseName: 'Kiyomizu-dera',
-                        tag: '🏯 절벽 목조 툇마루',
-                        image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '절벽 위에 못을 사용하지 않고 세워진 목조 무대와 교토 전경 조망',
-                        desc: '778년에 창건된 유네스코 세계문화유산으로, 웅장한 목조 무대에서 내려다보는 교토 시내 전망과 봄 벚꽃, 가을 단풍 풍경이 장관입니다. 올라가는 길인 산넨자카·닌넨자카 거리에는 예쁜 기치 전통 상점이 즐비합니다.',
-                        address: '京都府京都市東山区清水1-294 (1-294 Kiyomizu, Higashiyama Ward, Kyoto)',
-                        transport: '교토 시버스 206번/207번 탑승 후 [고죠자카(Gojo-zaka)] 또는 [기요미즈미치] 버스정류장 하차 후 언덕 도보 10분',
-                        mapQuery: 'Kiyomizu-dera, Kyoto',
-                        bestTime: '오전 8:00 또는 해질녘 계절 단풍 야간개장 타임',
-                        cost: '성인 400엔 (특별 야간관람 시 500엔)'
-                    },
-                    {
-                        id: 'kyoto_arashiyama',
-                        name: '아라시야마 치쿠린 대나무 숲',
-                        japaneseName: 'Arashiyama Bamboo Grove',
-                        tag: '🎋 힐링 대나무길',
-                        image: 'https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '바람 소리와 대나무 향이 머무는 울창한 힐링 대나무 숲길',
-                        desc: '수직으로 높이 솟은 수만 그루의 대나무가 하늘을 가리는 고즈넉한 오솔길입니다. 근처 텐류지 사원의 젠(Zen) 정원 및 아라시야마를 가로지르는 도게츠교 다리와 함께 사계절 자연을 만끽하기 좋습니다.',
-                        address: '京都府京都市右京区嵯峨小倉山田渕山町 (Sagaogurayama Tabuchiyamacho, Ukyo Ward, Kyoto)',
-                        transport: 'JR 사가노선 [사가아라시야마역] 도보 10분 / 한큐 전철 [아라시야마역] 도보 15분',
-                        mapQuery: 'Arashiyama Bamboo Grove, Kyoto',
-                        bestTime: '오전 8시 이전 (바람 소리를 들을 수 있는 호젓함)',
-                        cost: '대나무 숲 산책로 무료 (텐류지 사원 입장료 500엔)'
-                    }
-                ],
-                food: '가이세키 정식, 말차(Matcha) 디저트, 교토식 유두부(두부요리), 소바',
-                season: '가을 (11월 단풍 절정) / 봄 (4월 벚꽃)',
-                tip: '인기 명소(청수사, 후시미 이나리)는 오전 8시 이전에 방문해야 한적하게 사진을 찍을 수 있습니다.'
+                id: 'sushi_set',
+                name: '신선한 모둠 스시 (Edomae Sushi)',
+                category: 'sushi',
+                region: '도쿄 & 전국 해안도시',
+                icon: '🍣',
+                image: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '담백함, 감칠맛, 신선한 식감',
+                desc: '참치 도로, 연어, 성게알(우니), 단새우 등 현지의 가장 신선한 제철 해산물을 올려 정성껏 쥐어낸 스시 정식입니다.',
+                pairing: '따뜻한 녹차(아가지) 또는 깔끔한 사케',
+                recommendCity: '도쿄 긴자/츠키지, 오사카, 오타루'
             },
             {
-                id: 'osaka',
-                name: '오사카',
-                englishName: 'Osaka',
-                region: '간사이 (Kansai)',
-                category: 'urban',
-                categoryLabel: '🛍️ 미식 & 쇼핑',
+                id: 'okonomiyaki',
+                name: '오코노미야키 & 타코야키',
+                category: 'grill',
+                region: '오사카 / 간사이',
+                icon: '🍢',
                 image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80',
-                shortDesc: '활기찬 에너지, 글리코상 야경과 천하의 부엌이라 불리는 스트리트 푸드천국',
-                tagline: '입이 즐거운 식도락 여행과 유니버설 스튜디오의 즐거움이 가득한 도시',
-                envCards: [
-                    { title: '화려한 네온 간판', desc: '도톤보리 운하 주변의 입체적인 상점 간판과 활기찬 밤거리.', icon: 'fa-lightbulb' },
-                    { title: '운하와 친수 공간', desc: '도톤보리 강 크루즈 및 우메다 도심의 현대적 스카이라인.', icon: 'fa-water' },
-                    { title: '개방적인 상인 문화', desc: '친근하고 활발한 현지인들과 활력 넘치는 시장 분위기.', icon: 'fa-comments' }
-                ],
-                attractions: [
-                    {
-                        id: 'osaka_dotonbori',
-                        name: '도톤보리 & 글리코상 (Dotonbori)',
-                        japaneseName: 'Dōtonbori',
-                        tag: '🍢 스트리트 푸드 & 네온사인',
-                        image: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '달리는 마라토너 글리코상 간판과 타코야키 냄새가 가득한 오사카의 심장',
-                        desc: '운하를 따라 화려한 3D 입체 간판과 네온사인이 불을 밝히는 오사카 대표 번화가입니다. 도톤보리 리버 크루즈를 타거나 다리 위에서 글리코상 포즈로 인증샷을 남기는 것이 필수 코스입니다.',
-                        address: '大阪府大阪市中央区道頓堀1丁目 (Dotonbori, Chuo Ward, Osaka)',
-                        transport: '오사카 메트로 미도스지선/센니치마에선 [난바역(Namba)] 14번 출구 도보 3분',
-                        mapQuery: 'Dotonbori Glico Sign, Osaka',
-                        bestTime: '18:00~22:00 (네온사인 및 운하 야경 감상)',
-                        cost: '거리 무료 / 리버크루즈 약 1,200엔 (주유패스 무료)'
-                    },
-                    {
-                        id: 'osaka_castle',
-                        name: '오사카성 (Osaka Castle)',
-                        japaneseName: 'Osaka Castle (大阪城)',
-                        tag: '🏯 웅장한 성곽 공원',
-                        image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '높은 돌담과 해자로 둘러싸인 금빛 장식의 오사카 대표 역사 성곽',
-                        desc: '도요토미 히데요시가 건설한 성으로, 현재 천수각 내부는 오사카 역사를 다룬 박물관과 8층 전망대로 운영됩니다. 넓은 공원과 해자를 둘러보는 놀룻배(고자부네) 체험도 인기가 높습니다.',
-                        address: '大阪府大阪市中央区大阪城1-1 (1-1 Osakajo, Chuo Ward, Osaka)',
-                        transport: 'JR 오사카조코엔역(Osakajokoen) 도보 5분 또는 메트로 [다니마치욘초메역] 1B/9번 출구',
-                        mapQuery: 'Osaka Castle, Osaka',
-                        bestTime: '오전 9:00~11:00 (봄 벚꽃 및 단풍 시즌 추천)',
-                        cost: '공원 무료 / 천수각 입장료 600엔'
-                    },
-                    {
-                        id: 'osaka_usj',
-                        name: '유니버설 스튜디오 재팬 (USJ)',
-                        japaneseName: 'Universal Studios Japan',
-                        tag: '🎢 테마파크',
-                        image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
-                        shortDesc: '슈퍼 닌텐도 월드, 해리포터 등 몰입감 최고의 세계적 테마파크',
-                        desc: '마리오 카트를 즐기는 슈퍼 닌텐도 월드와 마법 주문을 외우는 해리포터 위저딩 월드, 해리포터와 미니언즈 등 남녀노소 누구나 즐길 수 있는 최고의 어트랙션 천국입니다.',
-                        address: '大阪府大阪市此花区桜島2-1-33 (2-1-33 Sakurajima, Konohana Ward, Osaka)',
-                        transport: 'JR 몽키선/유메사키선 [유니버설시티역(Universal-City)] 하차 도보 3분',
-                        mapQuery: 'Universal Studios Japan, Osaka',
-                        bestTime: '개장 1시간 전 도착 (사전 닌텐도 확약권/익스프레스 티켓 권장)',
-                        cost: '1일 자유이용권 약 8,600엔~10,400엔 (날짜별 변동)'
-                    }
-                ],
-                food: '타코야키, 오코노미야키, 쿠시카츠(꼬치튀김), 하이볼, 호르몬 구이',
-                season: '사계절 내내 방문하기 좋음 (봄 벚꽃, 가을 산책 추천)',
-                tip: '주요 관광지와 지하철을 무료 이용할 수 있는 주유패스(Osaka Amazing Pass) 활용을 추천합니다.'
+                flavorProfile: '단짠 소스, 가쓰오부시 풍미, 부드러운 속재료',
+                desc: '양배추, 돼지고기, 해산물을 철판 위에서 노릇하게 구워 단짠 특제 소스와 마요네즈, 가쓰오부시를 얹은 간사이 최고의 스트리트 푸드.',
+                pairing: '시원한 큼직한 가쿠 하이볼',
+                recommendCity: '오사카 도톤보리, 히로시마'
             },
             {
-                id: 'sapporo',
-                name: '삿포로 & 비에이',
+                id: 'soup_curry',
+                name: '삿포로 스프카레 (Soup Curry)',
+                category: 'stew',
+                region: '삿포로 (홋카이도)',
+                icon: '🍲',
+                image: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '매콤 칼칼한 향신료 국물 + 신선한 큼직 야채',
+                desc: '일반 카레와 달리 묽은 향신료 스튜 국물에 닭다리와 튀긴 단호박, 브로콜리, 가지 등을 통째로 넣어 먹는 삿포로 대표 힐링 미식.',
+                pairing: '구수한 라시(Lassi) 또는 삿포로 클래식 맥주',
+                recommendCity: '삿포로 시내 스스키노'
+            },
+            {
+                id: 'motsunabe',
+                name: '모츠나베 (곱창전골)',
+                category: 'stew',
+                region: '후쿠오카 (규슈)',
+                icon: '🥘',
+                image: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '쫄깃한 곱창 + 고소하고 칼칼한 부추 마늘 국물',
+                desc: '소 곱창과 양배추, 부추를 듬뿍 넣고 간장/미소 육수로 끓여낸 냄비 요리. 마지막에 짬뽕면을 말아 먹는 것이 정석입니다.',
+                pairing: '시원한 고구마 소주(이모쇼츄) 또는 하이볼',
+                recommendCity: '후쿠오카 하카타, 텐진'
+            },
+            {
+                id: 'jingisukan',
+                name: '징기스칸 (양고기 화로구이)',
+                category: 'grill',
+                region: '삿포로 (홋카이도)',
+                icon: '🥩',
+                image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '잡내 없는 어린 양고기의 육즙 + 달콤 특제 간장소스',
+                desc: '투구 모양의 둥근 철판 위에 양파, 숙주와 함께 어리고 신선한 양고기를 얹어 즉석에서 구워 먹는 홋카이도 특산 구이 요리.',
+                pairing: '삿포로 생맥주(Sapporo Draft)',
+                recommendCity: '삿포로 다누키코지, 스스키노'
+            },
+            {
+                id: 'gyukatsu',
+                name: '규카츠 & 돈카츠 (Gyukatsu)',
+                category: 'grill',
+                region: '도쿄 & 전국',
+                icon: '🍱',
+                image: 'https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '바삭한 튀김옷 + 사르르 녹는 소고기/돼지고기 육즙',
+                desc: '겉은 바삭하고 속은 촉촉한 미디엄 레어로 튀겨낸 소고기 카츠. 개인 개인용 미니 화로에 원하는 만큼 더 익혀 와사비를 얹어 먹습니다.',
+                pairing: '쌀밥 & 미소시루 & 아사히 맥주',
+                recommendCity: '도쿄 신주쿠/시부야, 오사카'
+            },
+            {
+                id: 'hitsumabushi',
+                name: '히츠마부시 (장어덮밥)',
+                category: 'sushi',
+                region: '나고야 / 간사이',
+                icon: '🍚',
+                image: 'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80',
+                flavorProfile: '숯불 향 진한 장어구이 + 짭조름 달콤한 타레 소스',
+                desc: '나고야 명물 요리로 나무 그릇(히츠)에 담긴 장어덮밥을 4가지 방법(그대로, 와사비/파 추가, 오차즈케, 최애 방식)으로 즐기는 명품 보양식.',
+                pairing: '따뜻한 녹차 & 시치미',
+                recommendCity: '나고야, 오사카, 도쿄'
+            }
+        ];
+
+        let currentFoodFilter = 'all';
+
+        // Switch Top Header Navigation Tabs
+        function switchTab(tab) {
+            const cityView = document.getElementById('cityExplorerView');
+            const menuView = document.getElementById('menuPickerView');
+            const navCityBtn = document.getElementById('navCityBtn');
+            const navMenuBtn = document.getElementById('navMenuBtn');
+
+            if (tab === 'city') {
+                cityView.classList.remove('hidden');
+                menuView.classList.add('hidden');
+
+                navCityBtn.className = "px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all bg-white text-slate-900 shadow-sm";
+                navMenuBtn.className = "px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all text-slate-600 hover:text-slate-900";
+            } else {
+                cityView.classList.add('hidden');
+                menuView.classList.remove('hidden');
+
+                navMenuBtn.className = "px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all bg-slate-900 text-white shadow-sm";
+                navCityBtn.className = "px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-bold rounded-full transition-all text-slate-600 hover:text-slate-900";
+
+                renderFoods(foodData);
+            }
+        }
+
+        // Render Food Cards Grid
+        function renderFoods(foods) {
+            const grid = document.getElementById('foodGrid');
+            const badge = document.getElementById('foodCountBadge');
+            if (badge) badge.textContent = `${foods.length}개 메뉴`;
+
+            if (foods.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-slate-400 bg-white rounded-2xl border border-slate-200">
+                        <p class="text-sm font-medium text-slate-500">해당 조건에 맞는 메뉴가 없습니다.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = foods.map(food => `
+                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="relative h-44 overflow-hidden bg-slate-800">
+                            <img src="${food.image}" alt="${food.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                            <span class="absolute top-3 left-3 text-xs font-extrabold px-3 py-1 bg-amber-500 text-white rounded-full shadow-md">
+                                ${food.icon} ${food.region}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-extrabold text-slate-900 text-base mb-1">${food.name}</h4>
+                            <div class="text-xs font-semibold text-amber-600 mb-2 flex items-center gap-1">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> ${food.flavorProfile}
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                ${food.desc}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 pt-0">
+                        <div class="bg-amber-50/80 p-2.5 rounded-xl border border-amber-100 text-[11px] text-amber-900 mb-3">
+                            <strong class="text-amber-700 block mb-0.5"><i class="fa-solid fa-wine-glass mr-1"></i>추천 조합 & 음료:</strong>
+                            ${food.pairing}
+                        </div>
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(food.name + ' 맛집')}" target="_blank" rel="noopener noreferrer"
+                           class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+                            <i class="fa-solid fa-utensils text-xs"></i> 구글 지도에서 맛집 검색
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter Food Categories
+        function filterFoods(category, event) {
+            currentFoodFilter = category;
+            
+            document.querySelectorAll('.food-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'shadow', 'active-food-filter');
+                btn.classList.add('bg-white', 'text-slate-700');
+            });
+
+            if (event && event.target) {
+                event.target.classList.remove('bg-white', 'text-slate-700');
+                event.target.classList.add('bg-slate-900', 'text-white', 'shadow', 'active-food-filter');
+            }
+
+            const filtered = (category === 'all') 
+                ? foodData 
+                : foodData.filter(f => f.category === category);
+
+            renderFoods(filtered);
+        }
+
+        // Random Food Roulette Wheel Spin
+        function spinFoodRoulette() {
+            if (foodData.length === 0) return;
+            
+            const randomFood = foodData[Math.floor(Math.random() * foodData.length)];
+            
+            // Show result modal or alert-style card
+            alert(`🎉 [오늘의 추천 메뉴 당첨!]\n\n👉 ${randomFood.name}\n📍 대표 지역: ${randomFood.region}\n💡 특징: ${randomFood.flavorProfile}\n\n오늘 한 끼는 ${randomFood.name}(으)로 즐겨보세요!`);
+        }
+
+        // Existing functions ...
                 englishName: 'Sapporo & Biei',
                 region: '홋카이도 (Hokkaido)',
                 category: 'nature',
